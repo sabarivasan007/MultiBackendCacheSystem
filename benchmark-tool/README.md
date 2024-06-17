@@ -3,7 +3,7 @@
 ## Overview
 This tool allows you to run a benchmark for different cache operations (set, get, delete)
 with configurable parameters such as the number of parallel clients, number of requests, payload size, 
-and whether to use multithreading. Adjust the HTTP request logic to match your actual server endpoints and methods
+and whether to use multithreading. Adjust the HTTP request logic to match your actual server endpoints and methods.
 
 ## System Requirements
 - Docker
