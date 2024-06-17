@@ -1,0 +1,239 @@
+definitions:
+  cache.CacheData:
+    properties:
+      key:
+        example: "1"
+        type: string
+      ttl:
+        $ref: '#/definitions/time.Duration'
+      value: {}
+    type: object
+  time.Duration:
+    enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    type: integer
+    x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+info:
+  contact: {}
+paths:
+  /cache:
+    post:
+      consumes:
+      - application/json
+      description: Set a value in the cache with a specified key and TTL (Time-To-Live)
+      operationId: set-cache-value
+      parameters:
+      - description: Cache Type
+        in: query
+        name: system
+        required: true
+        type: string
+      - description: Cache Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/cache.CacheData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'status: ok'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request payload or Unsupported cache type
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to set cache
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Set value in cache
+  /cache/{key}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a value from the cache using the provided key and cache
+        type
+      operationId: delete-cache-by-key
+      parameters:
+      - description: Cache Key
+        in: path
+        name: key
+        required: true
+        type: string
+      - description: Cache Type
+        in: query
+        name: system
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'status: ok'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Unsupported cache type
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Cache not Found - Failed to delete cache
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete value from cache by key
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a value from the cache using the provided key and cache
+        type
+      operationId: get-cache-by-key
+      parameters:
+      - description: Cache Key
+        in: path
+        name: key
+        required: true
+        type: string
+      - description: Cache Type
+        in: query
+        name: system
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Unsupported cache type
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to get cache
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get value from cache by key
+  /cache/TTL/{key}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a value and ttl from the cache using the provided key
+        and cache type
+      operationId: get-cache-with-ttl-by-key
+      parameters:
+      - description: Cache Key
+        in: path
+        name: key
+        required: true
+        type: string
+      - description: Cache Type
+        in: query
+        name: system
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Unsupported cache type
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Failed to get cache with TTL
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get value along with ttl and expiry time from cache by key
+  /cache/clear:
+    put:
+      consumes:
+      - application/json
+      description: clear caches for the provided cache type
+      operationId: clear-cache
+      parameters:
+      - description: Cache Type
+        in: query
+        name: system
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'status: ok'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Unsupported cache type
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Cache not Found - Failed to clear cache
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Clear all caches
+swagger: "2.0"

@@ -1,0 +1,12 @@
+IsTenantBased: false
+NumberOfTenants: "3"
+TenantIDs:
+  - tenant1
+  - tenant2
+  - tenant3
+CacheSystems:
+  - inmemory
+  - redis
+  - memcache
+DefaultTTL: 60
+MemoryUsagePercentage: 0.15
