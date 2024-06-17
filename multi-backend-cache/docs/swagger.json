@@ -64,61 +64,6 @@
                 }
             }
         },
-        "/cache/TTL/{key}": {
-            "get": {
-                "description": "Retrieve a value and ttl from the cache using the provided key and cache type",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get value along with ttl and expiry time from cache by key",
-                "operationId": "get-cache-with-ttl-by-key",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Cache Key",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Cache Type",
-                        "name": "system",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Unsupported cache type",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to get cache with TTL",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/cache/clear": {
             "put": {
                 "description": "clear caches for the provided cache type",
@@ -291,7 +236,12 @@
                     "example": "1"
                 },
                 "ttl": {
-                    "$ref": "#/definitions/time.Duration"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/time.Duration"
+                        }
+                    ],
+                    "example": 100
                 },
                 "value": {}
             }

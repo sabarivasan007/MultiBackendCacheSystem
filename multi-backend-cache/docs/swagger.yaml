@@ -5,7 +5,9 @@ definitions:
         example: "1"
         type: string
       ttl:
-        $ref: '#/definitions/time.Duration'
+        allOf:
+        - $ref: '#/definitions/time.Duration'
+        example: 100
       value: {}
     type: object
   time.Duration:
@@ -164,44 +166,6 @@ paths:
               type: string
             type: object
       summary: Get value from cache by key
-  /cache/TTL/{key}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve a value and ttl from the cache using the provided key
-        and cache type
-      operationId: get-cache-with-ttl-by-key
-      parameters:
-      - description: Cache Key
-        in: path
-        name: key
-        required: true
-        type: string
-      - description: Cache Type
-        in: query
-        name: system
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            type: string
-        "400":
-          description: Unsupported cache type
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Failed to get cache with TTL
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get value along with ttl and expiry time from cache by key
   /cache/clear:
     put:
       consumes:

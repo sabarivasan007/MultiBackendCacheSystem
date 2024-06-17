@@ -24,7 +24,7 @@ type CacheData struct { //node
 
 	Key        string        `json:"key" example:"1"`
 	Value      interface{}   `json:"value" `
-	TTL        time.Duration `json:"ttl" example:100`
+	TTL        time.Duration `json:"ttl" example:"100"`
 	ExpiryTime time.Time     `json:"expirytime" example:"2021-05-25T00:53:16.535668Z" format:"date-time" swaggerignore:"true"`
 }
 
