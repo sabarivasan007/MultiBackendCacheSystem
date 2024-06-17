@@ -1,96 +1,152 @@
-# Steps for running a spark job
-----
 
-### Some Checks in `SparkInit` before deploying the jar
+# Multi-Backend Cache System
 
-1. Recheck that you are setting `cassandra.privateIp` in `spark.cassandra.connection.host` of `SparkInit` object. 
-2. .setMaster() is optional(in case of DSE cluster) in the `SparkInit` object. // Comment it out
+## Overview
+The MultiBackend Cache System is designed to facilitate efficient data caching by utilizing multiple caching strategies. 
+This system supports Inmemory, Memcache and Redis implementations, allowing for flexible, scalable caching solutions suitable for a variety of applications.
+ 
+## Features
+- **Multiple Cache Backends**: Supports Inmemory, Memcache and Redis.
+- **Docker Integration**: Easily deployable in a containerized environment with Docker.
+- **Concurrency Safe**: Thread-safe implementations ensuring data integrity.
 
-**Note:** `SparkInit` is located at `com.precision.etl.utils.spark.`
+## Tenent Feature (only for inmemmory)
+- **In Memory** - Included Tenant Partition
+If you want to store the cache data into a specific tenant then have to change config IsTenantBased to true and provide tenantNames (max 3)
+There will be a slight changes in Api Endpoints
+## Table of Contents
 
-## Deploying the jar
-```bash
-sbt clean package
-```
-* After packaging, jar(without dependencies) will be generated under `target/scala-2.11/` from project's home directory.
+1. [Project Structure](#project-structure)
+2. [Getting Started](#getting-started)
+3. [Configuration](#configuration)
+4. [Deployment](#deployment)
+5. [Usage](#usage)
+6. [Testing](#testing)
+7. [Contributing](#contributing)
+8. [License](#license)
 
-```bash
-vishnu@dev:~precision_spark_etl$ ls target/scala-2.11/
-precision_spark_etl_2.11-0.1.jar  classes  resolution-cache
-```
+## Project Structure
 
-## Copying the jar
+\`\`\`
+multi-backend-cache/
+├── docker-compose.yml
+├── dockerFile
+├── go.mod
+├── go.sum
+├── prometheus.yml
+├── router.go
+├── docs/
+│   ├── docs.go
+│   ├── swagger.json
+│   └── swagger.yaml
+├── Internal/
+│   ├── cache/
+│   │   ├── inmemory.go
+│   │   ├── interface.go
+│   │   ├── memcache.go
+│   │   ├── mock_cache.go
+│   │   ├── redis.go
+│   │   └── tenantCacheManager.go
+│   ├── config/
+│   │   ├── config.go
+│   │   └── config.yaml
+│   ├── Handler/
+│   │   ├── handler.go
+│   │   └── middleware.go
+│   └── metrices/
+│       └── prometheus_model_info.go
+├── kuber-deployment/
+│   ├── go-service-deployment.yaml
+│   ├── mem-statefulset.yaml
+│   ├── redis-configmap.yaml
+│   ├── redis-statefulset.yaml
+│   ├── twem-config.yaml
+│   └── twemproxy.yaml
+├── packageUtils/Utils/
+│   └── utils.go
+└── test/
+    ├── inmemory_test.go
+    ├── server_test.go
+    ├── test_mock.go
+    └── test_server_test.go
+\`\`\`
 
-* Copy this jar to any of the dse cluster nodes.
+## Getting Started
 
-## Running the jar
-`--master`(Optional) - set the private ip of the master. (Format: dse://private-ip) No port needs to be mentioned.
+### Prerequisites
 
-`--packages` - specify the external dependencies that are used in the project(which are not there in the cluster).
+- [Go](https://golang.org/dl/)
+- [Docker](https://www.docker.com/products/docker-desktop)
 
-`--class`    - Specify the main class you want to run along with the package.
+### Installation
 
-To confirm that you're giving right path,
+1. Clone the repository:
+   \`\`\`sh
+   git clone https://github.com/sabarivasan007/MultiBackendCacheSystem
+   cd multi-backend-cache
+   \`\`\`
 
-* Go into the console by typing `sbt`
-* Run `show discoveredMainClasses`.
+2. Build the Docker image:
+   \`\`\`sh
+   docker build -t multi-backend-cache .
+   \`\`\`
 
-It will look like something below, copy your class path and specify it in the next step, where you submit the jar to the cluster.
+3. Start the services using Docker Compose:
+   \`\`\`sh
+   docker-compose up
+   \`\`\`
 
-```bash
-sbt:precision_spark_etl> show discoveredMainClasses
-[info] * com.precision.precision.etl.ingestion.LoadDataIntoSnowflake
-[info] * com.precision.precision.etl.ingestion.TableLevelETL
-[info] * com.precision.precision.etl.ingestion.experiments.LoadDataSourceIntoSnowflake
-[info] * com.precision.precision.etl.staging.CostShares
-[info] * com.precision.precision.etl.staging.DimTerritory
-[info] * com.precision.precision.etl.staging.Lives
-[info] * com.precision.precision.etl.staging.PayerLevelBenType
-[info] * com.precision.precision.etl.staging.StagingFormularyDetail
-[info] * com.precision.precision.etl.staging.StagingMajorityFormulary
-[info] * com.precision.precision.etl.staging.Zip5ToTerr
-[info] * com.precision.precision.etl.staging.test
-[info] * com.precision.precision.etl.validation.DataValidation
-[success] Total time: 7 s, completed 9 Sep, 2019 4:25:05 PM
-sbt:precision_spark_etl> 
-```
+## Configuration
 
-* Finally give the path to the jar in that node you've copied.
+The configuration file \`config.yaml\` is located in the \`Internal/config/\` directory. It includes settings for the different cache backends and other application configurations.
 
-For Example, 
+## Deployment
 
-```bash
-dse spark-submit --packages net.snowflake:spark-snowflake_2.11:2.5.2-spark_2.4,com.typesafe:config:1.3.4,com.amazonaws:aws-java-sdk:1.11.46 --class com.precision.precision.etl.staging.Zip5ToTerr precision_spark_etl_2.11-0.1.jar
-```
+### Docker Compose
 
-```bash
-dse -u cassandra -p cassandra spark-submit --packages "net.snowflake:spark-snowflake_2.11:2.5.2-spark_2.4,com.typesafe:config:1.3.4,com.amazonaws:aws-java-sdk:1.11.46,com.amazonaws:aws-java-sdk-bom:1.11.682,com.amazonaws:aws-java-sdk-secretsmanager:1.11.682" --executor-memory "7g" --class "com.precision.etl.ingestion.TableLevelETL" /home/ubuntu/urovant_etl_jar/precision_spark_etl_2.11-0.1.jar "IQvia XPT" "TEMP_XPT_PLANTRAK_EXPANDED"
+To deploy the application using Docker Compose, run:
+\`\`\`sh
+docker-compose up
+\`\`\`
 
-```
 
-* Additionally you can choose submit mode of the job.
+## Usage
 
-`--deploy-mode` 
+The application routes and handlers are defined in \`router.go\` and the \`Internal/Handler/\` directory. API documentation is available in the \`docs/\` directory and can be accessed via Swagger UI.
 
-`cluster`
 
-* Your driver code will run inside any of the nodes inside the cluster.
-* No debug info will be printed in the console.
-* Choose this mode in case of long running jobs.(For production)
 
-`client`
+## System Options:
+- redis
+- memcache
+- inmemory
 
-* Default mode
-* Driver code will start from where you are submitting the job.
-* Here you could able to see debug informations.
-* Choose this when you are testing your code/logic. (Development phase)
+## APIs Interact with the cache:
+examples:
 
----- 
+### Set a cache entry:
+## POST - http://34.234.207.91:8080/cache?system=inmemory
+## with Tenant details  http://34.234.207.91:8080/cache?system=inmemory&tenantId=tenant1
+\`\`\`json
+{
+    "key": "example", 
+    "value": "123",
+    "ttl": 10
+}
+\`\`\`
 
-## Loading metadata into casandra 
+### Get a cache entry:
+GET - http://34.234.207.91:8080/cache/exampleKey?system=inmemory
+## with Tenant details  http://34.234.207.91:8080/cache/tenant1/exampleKey?system=inmemory&tenantId=tenant1
 
-Download/Export metadata sheet as TSV file and copy into C* table.
-```
-COPY urovant.data_source_entity(data_vendor,data_name,group_id,entity_name,snowflake_table_name,table_type,ref_table_date_column,has_control_file,filename_affix_type,control_filename_affix_type,filename_affix,control_filename_affix,exclude_filename_affix,table_order,file_type_for_missing_file_validation,file_type,control_file_type,archived_filename_affix,archived_control_filename_affix,schema_type_id,check_for_new_prescriber,"schema",SCHEMA_CDC,schema_type,column_delimiter,row_delimiter,field_enclosed_by,validation_criteria,description,data_arrival_frequency,ingestion_mode,ingestion_type,ingestion_type_auth,ingestion_type_base_uri,s3_bucket,s3_folder,dsefs_path,control_file_dsefs_path,ingestion_type_credentials,table_count,target_date,header,row_duplication_check) FROM 'Urovant_metadata.tsv' WITH HEADER=true AND DELIMITER='@';
+### Delete a cache entry:
+DELETE - http://34.234.207.91:8080/cache/dhoni?system=inmemory
+## with Tenant details  http://34.234.207.91:8080/cache?system=inmemory&tenantId=tenant1
 
-```
+
+### Clear all cache entries:
+PUT - http://34.234.207.91:8080/cache/clear?system=inmemory
+## with Tenant details  http://34.234.207.91:8080/cache/clear?system=inmemory&tenantId=tenant1
+
+
+
