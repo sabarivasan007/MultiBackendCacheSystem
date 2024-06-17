@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "94e33dbb-c424-4031-8337-e00d83cb3ab4",
 		"name": "Multi-Backend-Cache",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "15654441"
 	},
 	"item": [
@@ -12,10 +12,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/cache/dhoni?system=redis",
+					"raw": "http://34.234.207.91:8080/cache/dhoni?system=redis",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"34",
+						"234",
+						"207",
+						"91"
 					],
 					"port": "8080",
 					"path": [
@@ -36,7 +39,36 @@
 			"name": "set cache",
 			"request": {
 				"method": "POST",
-				"header": []
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"key\": \"dhoni\",\r\n    \"value\": \"csk\",\r\n    \"ttl\": 20\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://34.234.207.91:8080/cache?system=inmemory",
+					"protocol": "http",
+					"host": [
+						"34",
+						"234",
+						"207",
+						"91"
+					],
+					"port": "8080",
+					"path": [
+						"cache"
+					],
+					"query": [
+						{
+							"key": "system",
+							"value": "inmemory"
+						}
+					]
+				}
 			},
 			"response": []
 		},
@@ -44,7 +76,28 @@
 			"name": "delete",
 			"request": {
 				"method": "DELETE",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "http://34.234.207.91:8080/cache/dhoni?system=memcache",
+					"protocol": "http",
+					"host": [
+						"34",
+						"234",
+						"207",
+						"91"
+					],
+					"port": "8080",
+					"path": [
+						"cache",
+						"dhoni"
+					],
+					"query": [
+						{
+							"key": "system",
+							"value": "memcache"
+						}
+					]
+				}
 			},
 			"response": []
 		},
@@ -54,10 +107,13 @@
 				"method": "PUT",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/cache/clear?cache=inmemory",
+					"raw": "http://34.234.207.91:8080/cache/clear?system=memcache",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"34",
+						"234",
+						"207",
+						"91"
 					],
 					"port": "8080",
 					"path": [
@@ -66,8 +122,8 @@
 					],
 					"query": [
 						{
-							"key": "cache",
-							"value": "inmemory"
+							"key": "system",
+							"value": "memcache"
 						}
 					]
 				}
