@@ -120,7 +120,7 @@ examples:
 
 ### Set a cache entry:
 #### POST - http://34.234.207.91:8080/cache?system=inmemory
-### with Tenant details  http://34.234.207.91:8080/cache?system=inmemory&tenantID=tenant1
+#### with Tenant details  http://34.234.207.91:8080/cache?system=inmemory&tenantID=tenant1
 \`\`\`json
 {
     "key": "exampleKey", 
