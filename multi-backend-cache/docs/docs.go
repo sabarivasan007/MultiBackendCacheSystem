@@ -46,31 +46,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "status: ok",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "status: ok"
                     },
                     "400": {
-                        "description": "Invalid request payload or Unsupported cache type",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Failed to set cache",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -97,31 +82,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "status: ok",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "status: ok"
                     },
                     "400": {
-                        "description": "Unsupported cache type",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Cache not Found - Failed to clear cache",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -155,28 +125,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "string"
-                        }
+                        "description": "status: ok"
                     },
                     "400": {
-                        "description": "Unsupported cache type",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Bas Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Failed to get cache",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -208,31 +166,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "status: ok",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "status: ok"
                     },
                     "400": {
-                        "description": "Unsupported cache type",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Cache not Found - Failed to delete cache",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -275,7 +218,18 @@ const docTemplate = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000,
+                1,
+                1000,
+                1000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -293,7 +247,18 @@ const docTemplate = `{
                 "Millisecond",
                 "Second",
                 "Minute",
-                "Hour"
+                "Hour",
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond"
             ]
         }
     }

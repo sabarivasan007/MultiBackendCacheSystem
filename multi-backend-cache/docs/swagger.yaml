@@ -28,6 +28,17 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - 1
+    - 1000
+    - 1000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -46,6 +57,17 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - Nanosecond
+    - Microsecond
+    - Millisecond
 info:
   contact: {}
 paths:
@@ -72,22 +94,12 @@ paths:
       responses:
         "200":
           description: 'status: ok'
-          schema:
-            additionalProperties:
-              type: string
-            type: object
         "400":
-          description: Invalid request payload or Unsupported cache type
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
-          description: Failed to set cache
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Internal Server Error
       summary: Set value in cache
   /cache/{key}:
     delete:
@@ -112,22 +124,12 @@ paths:
       responses:
         "200":
           description: 'status: ok'
-          schema:
-            additionalProperties:
-              type: string
-            type: object
         "400":
-          description: Unsupported cache type
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
-          description: Cache not Found - Failed to delete cache
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Internal Server Error
       summary: Delete value from cache by key
     get:
       consumes:
@@ -150,21 +152,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: ok
-          schema:
-            type: string
+          description: 'status: ok'
         "400":
-          description: Unsupported cache type
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Bas Request
+        "404":
+          description: Not Found
         "500":
-          description: Failed to get cache
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Internal Server Error
       summary: Get value from cache by key
   /cache/clear:
     put:
@@ -183,21 +177,11 @@ paths:
       responses:
         "200":
           description: 'status: ok'
-          schema:
-            additionalProperties:
-              type: string
-            type: object
         "400":
-          description: Unsupported cache type
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
-          description: Cache not Found - Failed to clear cache
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Internal Server Error
       summary: Clear all caches
 swagger: "2.0"

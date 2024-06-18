@@ -3,10 +3,9 @@ package cache
 import (
 	"container/list"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
-
+	utils "multi-backend-cache/packageUtils/Utils"
 	"reflect"
 	"sync"
 	"time"
@@ -188,7 +187,8 @@ func (c *LRUCache) Get(key string) (interface{}, error) {
 			c.list.Remove(element)
 			delete(c.index, key)
 			c.used -= size
-			return nil, fmt.Errorf("key %s has expired", key)
+			// return nil, fmt.Errorf("key %s has expired", key)
+			return nil, utils.NotFound
 		}
 		log.Println("stp-1 node.TTL:", node.TTL.Seconds())
 		// expiryTime := c.CalculateExpiryTime(node.TTL) //extend expiry
@@ -199,7 +199,7 @@ func (c *LRUCache) Get(key string) (interface{}, error) {
 		c.list.MoveToFront(element)
 		return node.Value, Err
 	} else {
-		return nil, errors.New("key not found")
+		return nil, utils.NotFound
 	}
 }
 
@@ -248,11 +248,11 @@ func (c *LRUCache) Set(key string, value interface{}, ttl time.Duration) error {
 		ttl = c.defaultTTL
 	}
 	logrus.Debugf("TTL for key %s: %s", key, ttl)
-	if key == "" {
-		err := errors.New("key must not be null")
-		logrus.Error("Set error:", err)
-		return err
-	}
+	// if key == "" {
+	// 	err := errors.New("key must not be null")
+	// 	logrus.Error("Set error:", err)
+	// 	return err
+	// }
 	expiryTime := CalculateExpiryTime(ttl)
 	if element, found := c.index[key]; found {
 		logrus.Infof("Updating existing cache for key %s", key)
@@ -308,7 +308,7 @@ func (c *LRUCache) Delete(key string) error {
 		logrus.Infof("Deleted cache for key %s", key)
 		return nil
 	} else {
-		return errors.New("cache not found")
+		return utils.NotFound
 	}
 }
 

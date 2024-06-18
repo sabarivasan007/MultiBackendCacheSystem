@@ -58,7 +58,7 @@ func (m *Metrics) Middleware() gin.HandlerFunc {
 		m.totalLatency.Observe(latency.Seconds())
 		if c.Writer.Status() >= http.StatusOK && c.Writer.Status() < http.StatusMultipleChoices {
 			m.successHits.Inc()
-		} else {
+		} else if c.Writer.Status() == http.StatusInternalServerError {
 			m.failureHits.Inc()
 		}
 

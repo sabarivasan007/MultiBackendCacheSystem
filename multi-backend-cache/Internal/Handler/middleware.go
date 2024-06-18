@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"multi-backend-cache/Internal/config"
 	"net/http"
 
@@ -10,8 +11,10 @@ import (
 func ValidateTenant() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tenantID := c.Param("tenantID")
+		fmt.Println("tenantparammmm", tenantID)
 		if tenantID == "" {
 			tenantID = c.GetHeader("X-Tenant-ID")
+			fmt.Println("tenantId", tenantID)
 		}
 
 		if tenantID == "" || !isTenantValid(tenantID) {

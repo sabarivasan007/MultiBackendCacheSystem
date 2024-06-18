@@ -8,11 +8,13 @@ import (
 )
 
 type Config struct {
-	IsTenantBased   bool     `mapstructure:"IsTenantBased"`
-	NumberOfTenants string   `mapstructure:"NumberOfTenants"`
-	TenantIDs       []string `mapstructure:"TenantIDs"`
-	DefaultTTL      int      `mapstructure:"defaultTTL"`
-	CacheSystems    []string `mapstructure:"CacheSystems"`
+	IsTenantBased   		bool     `mapstructure:"IsTenantBased"`
+	NumberOfTenants 		string   `mapstructure:"NumberOfTenants"`
+	TenantIDs       		[]string `mapstructure:"TenantIDs"`
+	DefaultTTL      		int      `mapstructure:"defaultTTL"`
+	CacheSystems    		[]string `mapstructure:"CacheSystems"`
+	MemoryUsagePercentage 	float64	 `mapstructure:"MemoryUsagePercentage"`
+	IP 						string	 `mapstructure:"IP"`
 }
 
 var AppConfig Config

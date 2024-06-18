@@ -10,3 +10,5 @@ CacheSystems:
   - memcache
 DefaultTTL: 60
 MemoryUsagePercentage: 0.15
+# IP: "34.234.207.91"
+IP: "localhost"

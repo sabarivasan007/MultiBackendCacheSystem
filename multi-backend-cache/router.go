@@ -12,7 +12,6 @@ import (
 
 	"github.com/pbnjay/memory"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/viper"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -30,10 +29,10 @@ func DefaultModelsExpandDepth(depth int) func(*ginSwagger.Config) {
 
 func main() {
 	config.LoadConfig("./Internal/config/config.yaml")
-	defaultTTL := viper.GetInt("defaultTTL")
+	defaultTTL := config.AppConfig.DefaultTTL
 	redisCache := cache.NewRedisCache("redis:6379", "", 0, 1*time.Minute)
 	memCache := cache.NewMemCache("memcached:11211", 60)
-	totalCacheMemory := int(float64(memory.TotalMemory()) * viper.GetFloat64("MemoryUsagePercentage"))
+	totalCacheMemory := int(float64(memory.TotalMemory()) * config.AppConfig.MemoryUsagePercentage)
 
 	fmt.Println("totalCacheMemory", totalCacheMemory)
 	// Initialize tenant-specific in-memory LRUCaches
@@ -51,7 +50,8 @@ func main() {
 
 	router := gin.Default()
 
-	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
+	host := fmt.Sprintf("http://%s:8080/swagger/doc.json", config.AppConfig.IP)
+	url := ginSwagger.URL(host)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler,
 	//     ginSwagger.URL("http://localhost:8080/swagger/doc.json"),

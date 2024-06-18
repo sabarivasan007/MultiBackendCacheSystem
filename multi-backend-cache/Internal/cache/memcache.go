@@ -2,7 +2,7 @@ package cache
 
 import (
 	"encoding/json"
-	"fmt"
+	utils "multi-backend-cache/packageUtils/Utils"
 	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
@@ -26,8 +26,7 @@ func (m *MemCache) Get(key string) (interface{}, error) {
 	// fmt.Println(item.Expiration)
 	if err != nil {
 		if err == memcache.ErrCacheMiss {
-			logrus.Debugf("Get: key %s does not exist", key)
-			return nil, fmt.Errorf("key %s does not exist", key)
+			return nil, utils.NotFound
 		}
 		logrus.Errorf("Get: error getting key %s: %v", key, err)
 		return nil, err
@@ -79,7 +78,8 @@ func (m *MemCache) Delete(key string) error {
 	if err != nil {
 		if err == memcache.ErrCacheMiss {
 			logrus.Debugf("Delete: key %s does not exist", key)
-			return nil
+			// return err
+			return utils.NotFound
 		}
 		logrus.Errorf("Delete: error deleting key %s: %v", key, err)
 	}

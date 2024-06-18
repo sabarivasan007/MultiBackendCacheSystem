@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	utils "multi-backend-cache/packageUtils/Utils"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -15,6 +16,8 @@ type RedisCache struct {
 	client *redis.Client
 	ttl    time.Duration
 }
+
+// var NotFound = errors.New("key does not exist")
 
 func NewRedisCache(addr string, password string, db int, ttl time.Duration) *RedisCache {
 	client := redis.NewClient(&redis.Options{
@@ -37,7 +40,8 @@ func (r *RedisCache) Get(key string) (interface{}, error) {
 	val, err := r.client.Get(context.Background(), key).Result()
 	if err != nil {
 		if err == redis.Nil {
-			return nil, fmt.Errorf("key does not exist")
+			// return nil, fmt.Errorf("key does not exist")
+			return nil, utils.NotFound
 		}
 		return nil, err
 	}
@@ -75,6 +79,7 @@ func (r *RedisCache) Get(key string) (interface{}, error) {
 // }
 
 func (r *RedisCache) Set(key string, value interface{}, ttl time.Duration) error {
+
 	ttlDuration := time.Duration(ttl) * time.Second
 	val, err := json.Marshal(value)
 	if err != nil {
@@ -93,11 +98,17 @@ func (r *RedisCache) Set(key string, value interface{}, ttl time.Duration) error
 }
 
 func (r *RedisCache) Delete(key string) error {
-	err := r.client.Del(context.Background(), key).Err()
+	result, err := r.client.Del(context.Background(), key).Result()
 	if err != nil {
 		logrus.Errorf("Delete: error deleting key %s: %v", key, err)
+		return err
 	}
-	return err
+
+	if result == 0 {
+		// logrus.Errorf("Delete: key %s not found", key)
+		return utils.NotFound
+	}
+	return nil
 }
 
 func (r *RedisCache) Clear() error {

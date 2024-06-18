@@ -2,9 +2,12 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 )
+
+var NotFound = errors.New("Key Does not exist")
 
 // RespondJSON sends a JSON response with status code
 func RespondJSON(w http.ResponseWriter, status int, data interface{}) {

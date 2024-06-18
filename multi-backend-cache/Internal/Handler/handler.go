@@ -78,9 +78,10 @@ func (s *Server) determineCacheLibraryType(cacheType string, tenantID string) ca
 // @Produce  json
 // @Param   key        path    string  true  "Cache Key"
 // @Param   system      query   string  true  "Cache Type"
-// @Success 200 {string} string  "ok"
-// @Failure 400 {object} map[string]string "Unsupported cache type"
-// @Failure 500 {object} map[string]string "Failed to get cache"
+// @Success 200  "status: ok"
+// @Failure 400  "Bas Request"
+// @Failure 404  "Not Found"
+// @Failure 500  "Internal Server Error"
 // @Router /cache/{key} [get]
 func (s *Server) GetCacheHandler(c *gin.Context) {
 	key := c.Param("key")
@@ -96,11 +97,16 @@ func (s *Server) GetCacheHandler(c *gin.Context) {
 
 	value, err := cache.Get(key)
 	if err != nil {
+
+		if err.Error() == utils.NotFound.Error() {
+			logrus.Errorf("Error: key %s: %v", key, err)
+			utils.RespondError(c.Writer, http.StatusNotFound, err.Error())
+			return
+		}
 		logrus.Errorf("Error while getting cache for key %s: %v", key, err)
-		utils.RespondError(c.Writer, http.StatusNotFound, err.Error())
+		utils.RespondError(c.Writer, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	logrus.Infof("Cache retrieved for key %s: %v", key, value)
 	utils.RespondJSON(c.Writer, http.StatusOK, value)
 }
@@ -146,14 +152,22 @@ var payload cache.CacheData
 // @Produce json
 // @Param system query string true "Cache Type"
 // @Param payload body cache.CacheData true "Cache Payload"
-// @Success 200 {object} map[string]string "status: ok"
-// @Failure 400 {object} map[string]string "Invalid request payload or Unsupported cache type"
-// @Failure 500 {object} map[string]string "Failed to set cache"
+// @Success 200  "status: ok"
+// @Failure 400  "Bad Request"
+// @Failure 404  "Not Found"
+// @Failure 500  "Internal Server Error"
 // @Router /cache [post]
 func (s *Server) SetCacheHandler(c *gin.Context) {
+
 	if err := c.ShouldBindJSON(&payload); err != nil {
+
 		logrus.Error("Invalid request payload", err)
 		utils.RespondError(c.Writer, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	if payload.Key == "" {
+		logrus.Error("Key must not be null")
+		utils.RespondError(c.Writer, http.StatusNotFound, "Key must not be null")
 		return
 	}
 
@@ -186,9 +200,10 @@ func (s *Server) SetCacheHandler(c *gin.Context) {
 // @Produce  json
 // @Param   key        path    string  true  "Cache Key"
 // @Param   system      query   string  true  "Cache Type"
-// @Success 200 {object} map[string]string "status: ok"
-// @Failure 400 {object} map[string]string "Unsupported cache type"
-// @Failure 500 {object} map[string]string "Cache not Found - Failed to delete cache"
+// @Success 200  "status: ok"
+// @Failure 400  "Bad Request"
+// @Failure 404  "Not Found"
+// @Failure 500  "Internal Server Error"
 // @Router /cache/{key} [delete]
 func (s *Server) DeleteCacheHandler(c *gin.Context) {
 	key := c.Param("key")
@@ -207,8 +222,13 @@ func (s *Server) DeleteCacheHandler(c *gin.Context) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if err := cache.Delete(key); err != nil {
+		if err.Error() == utils.NotFound.Error() {
+			logrus.Errorf("Error for key %s: %v", key, err)
+			utils.RespondError(c.Writer, http.StatusNotFound, "Cache not Found - Failed to delete cache")
+			return
+		}
 		logrus.Errorf("Error while deleting cache for key %s: %v", key, err)
-		utils.RespondError(c.Writer, http.StatusInternalServerError, "Cache not Found - Failed to delete cache")
+		utils.RespondError(c.Writer, http.StatusInternalServerError, "Failed to delete cache")
 		return
 	}
 
@@ -222,9 +242,10 @@ func (s *Server) DeleteCacheHandler(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param   system      query   string  true  "Cache Type"
-// @Success 200 {object} map[string]string "status: ok"
-// @Failure 400 {object} map[string]string "Unsupported cache type"
-// @Failure 500 {object} map[string]string "Cache not Found - Failed to clear cache"
+// @Success 200  "status: ok"
+// @Failure 400  "Bad Request"
+// @Failure 404  "Not Found"
+// @Failure 500  "Internal Server Error"
 // @Router /cache/clear [put]
 func (s *Server) ClearCacheHandler(c *gin.Context) {
 	CacheLibraryType := c.Query("system")
